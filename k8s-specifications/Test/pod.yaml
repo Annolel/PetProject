@@ -4,10 +4,10 @@ metadata:
   labels:
     app: front-end
     size: mid
-  name: my-nginx-yaml
+  name: my-nginx
 spec:
   containers:
-    - name: my-nginx-yaml
+    - name: my-nginx
       image: nginx
       ports:
         - containerPort: 80
