@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-1
+  namespace: default
+  labels:
+    k8slens-edit-resource-version: v1
+spec:
+  schedule: 0 2 * * *
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          volumes:
+          - name: azure
+          csi:
+            driver: file.csi.azure.com
+            volumeAttributes:
+              mountOptions: dir_mode=0777,file_mode=0777,cache=strict,actimeo=30
+              secretName: azure-secret
+              shareName: pgbackup
+          containers:
+            - name: postgres-backup
+              image: postgres:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+              args:
+                - '-c'
+                - >-
+                  PGPASSWORD=$(POSTGRES_PASSWORD) pg_dump -U postgres -h
+                  postgresql-1697882731 -F t postgres >
+                  /var/backups/backup-$(date + "%m-%d-%Y-%H-%M").sql
+              env:
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-1697882731
+                      key: postgres-password
+              resources: {}
+              volumeMounts:
+              - name: azure
+                mountPath: /var/backups/
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: Always
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1

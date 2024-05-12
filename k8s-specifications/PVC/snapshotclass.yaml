@@ -1,0 +1,10 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: pg-backup
+  labels:
+    k8slens-edit-resource-version: v1
+deleteionPolicy: Delete
+driver: disk.csi.azure.com
+parameters:
+  incremental: 'true'

@@ -1,0 +1,25 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: vote-vpa
+  namespace: default
+  resourceVersion: "45783"
+spec:
+  resourcePolicy:
+    containerPolicies:
+      - containerName: '*'
+        controlledResources:
+          - cpu
+          - memory
+        maxAllowed:
+          cpu: 1
+          memory: 500Mi 
+        minAllowed:
+          cpu: 100m 
+          memory: 90Mi 
+  targetRef:
+    apiVersion: apps/v1 
+    kind: Deployment 
+    name: vote 
+  updatePolicy:
+    updateMode: Auto

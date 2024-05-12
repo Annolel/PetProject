@@ -1,0 +1,9 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: azuredisk-volume-snapshot-1
+  namespace: default
+spec:
+  source:
+    persistentVolumeClaimName: data-postgresql
+  volumeSnapshotClassName: pg-backup
